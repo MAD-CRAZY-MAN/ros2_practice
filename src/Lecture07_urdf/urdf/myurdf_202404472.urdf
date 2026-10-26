@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!-- RRP 로봇: q1(revolute, z축) - q2(revolute, 수평축) - q3(prismatic, 팔 방향) -->
+<robot name="rrp_robot">
+
+  <!-- 바닥 베이스 (원통) -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.025"/>
+      <geometry><cylinder radius="0.12" length="0.05"/></geometry>
+      <material name="gray"><color rgba="0.6 0.6 0.6 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Link1: 수직 기둥 (높이 d1 = 0.45) -->
+  <link name="link1">
+    <visual>
+      <origin xyz="0 0 0.225"/>
+      <geometry><cylinder radius="0.04" length="0.45"/></geometry>
+      <material name="white"><color rgba="0.9 0.9 0.9 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Link2: 회전하는 팔 (바깥쪽 슬리브), x축 방향으로 뻗음 -->
+  <link name="link2">
+    <visual>
+      <origin xyz="0.2 0 0" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.035" length="0.4"/></geometry>
+      <material name="darkgray"><color rgba="0.4 0.4 0.45 1"/></material>
+    </visual>
+  </link>
+
+  <!-- Link3: 슬라이딩 팔 (안쪽 로드) -->
+  <link name="link3">
+    <visual>
+      <origin xyz="0.2 0 0" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.022" length="0.4"/></geometry>
+      <material name="light"><color rgba="0.8 0.8 0.8 1"/></material>
+    </visual>
+  </link>
+
+  <!-- 끝점 P (엔드이펙터) -->
+  <link name="tool">
+    <visual>
+      <geometry><sphere radius="0.035"/></geometry>
+      <material name="teal"><color rgba="0.0 0.6 0.63 1"/></material>
+    </visual>
+  </link>
+
+  <!-- q1: 베이스 회전 (z축), revolute -->
+  <joint name="joint1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0.05"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="10.0" velocity="1.0"/>
+  </joint>
+
+  <!-- q2: 어깨 pitch 회전, revolute (축 -y: q2 증가 시 팔이 위로 올라감) -->
+  <joint name="joint2" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 0.45"/>
+    <axis xyz="0 -1 0"/>
+    <limit lower="-0.5" upper="1.57" effort="10.0" velocity="1.0"/>
+  </joint>
+
+  <!-- q3: 팔 길이 방향 직선 이동, prismatic -->
+  <joint name="joint3" type="prismatic">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0.2 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0.0" upper="0.3" effort="10.0" velocity="0.5"/>
+  </joint>
+
+  <!-- 끝점 고정 -->
+  <joint name="tool_joint" type="fixed">
+    <parent link="link3"/>
+    <child link="tool"/>
+    <origin xyz="0.4 0 0"/>
+  </joint>
+
+</robot>
